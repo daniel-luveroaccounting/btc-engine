@@ -790,8 +790,9 @@ var LV = (function () {
   /* =========================================================================
      4) CAPTURE BLOCK
      -------------------------------------------------------------------------
-     Results are always shown in full above this. The email is optional and is
-     only ever offered in exchange for a PDF copy.
+     Results are always shown in full above this. The form below is optional.
+     It collects contact details only: no figures leave the page, and the PDF
+     is a browser print the visitor keeps. Nothing is emailed to the visitor.
 
      The form itself is the ClientMax form "Tools site capture", embedded as an
      iframe. It is not a hand-rolled form posting to a webhook: the ClientMax
@@ -820,7 +821,7 @@ var LV = (function () {
         '<div class="lv-capture__embed">' +
           '<iframe src="' + CAPTURE_FORM_SRC + '" ' +
             'id="' + frameId + '" ' +
-            'title="Email me a copy" ' +
+            'title="Ask us to check this" ' +
             'style="width:100%;height:520px;border:none;border-radius:10px" ' +
             "data-layout=\"{'id':'INLINE'}\" " +
             'data-trigger-type="alwaysShow" ' +
@@ -1123,9 +1124,11 @@ var LV = (function () {
   /* =========================================================================
      9) RESULT CARD
      -------------------------------------------------------------------------
-     The headline answer, with copy, share, email and PDF actions. The email
-     action only scrolls to the capture form further down the page; the
-     result is always on screen before any email is asked for.
+     The headline answer, with copy, share, "Ask us to check this" and PDF
+     actions. The "Ask us to check this" action (data-act="email", kept for
+     the emailTarget option name) only scrolls to the capture form further
+     down the page; nothing is sent. The result is always on screen before
+     any contact details are asked for.
      ========================================================================= */
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1161,7 +1164,7 @@ var LV = (function () {
         '<div class="lv-result__actions lv-no-print">' +
           '<button type="button" class="lv-btn lv-btn--sm" data-act="copy">Copy result</button>' +
           '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="share">Share calculation</button>' +
-          (o.emailTarget ? '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="email">Email result</button>' : "") +
+          (o.emailTarget ? '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="email">Ask us to check this</button>' : "") +
           '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="pdf">Save as PDF</button>' +
           '<span class="lv-result__toast" role="status" hidden></span>' +
         '</div>' +

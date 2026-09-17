@@ -526,7 +526,7 @@ var LV = (function () {
   /* Employer NI across a payroll. `salaries` is an array of annual gross
      salaries. The Employment Allowance is set against the total, capped at
      the allowance and at the liability. Eligibility (not a sole-director
-     company, secondary liability under £100,000 last year) is the caller's
+     company, connected companies sharing one allowance) is the caller's
      question; the engine only does the arithmetic. */
   function payrollEmployerNI(salaries, year, useEA) {
     var r = rates(year).niEmployer;

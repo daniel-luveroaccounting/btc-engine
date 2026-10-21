@@ -757,34 +757,39 @@ var LV = (function () {
      -------------------------------------------------------------------------
      Save as PDF, and a way to reach a human. On every tool.
      ========================================================================= */
+  /* Spreadsheet versions of some calculators, sold on Etsy (Plain Ledger shop).
+     Added 26/09/2026 for the £50 experiment. Shown only on the matching page,
+     inside the "Take your results away" box. Prices are as UK buyers see them
+     on Etsy, including VAT; update them here if the Etsy price changes. */
+  var SPREADSHEETS = {
+    "/salary-vs-dividend":      ["4583275955/salary-vs-dividend-calculator-uk-202627", "salary vs dividend", "8.99"],
+    "/director-take-home":      ["4583275955/salary-vs-dividend-calculator-uk-202627", "salary vs dividend", "8.99"],
+    "/pay-myself":              ["4583275955/salary-vs-dividend-calculator-uk-202627", "salary vs dividend", "8.99"],
+    "/company-tax-calculator":  ["4583277021/corporation-tax-calculator-uk", "Corporation Tax", "5.99"],
+    "/dividend-tax-calculator": ["4583289200/dividend-tax-calculator-uk-202627", "dividend tax", "5.99"],
+    "/employer-ni-calculator":  ["4583278903/employer-national-insurance-calculator", "employer NI", "5.99"]
+  };
+
+  function spreadsheetHTML() {
+    var path = (window.location.pathname || "").replace(/\/+$/, "");
+    var s = SPREADSHEETS[path];
+    if (!s) return "";
+    var href = "https://www.etsy.com/uk/listing/" + s[0] +
+      "?utm_source=businesstaxcalculator&utm_medium=referral&utm_campaign=" + path.slice(1);
+    return '<p style="margin-top:14px">Prefer a spreadsheet? Our ' + esc(s[1]) +
+      ' calculator is also available as an Excel and Google Sheets file you can keep and reuse. ' +
+      '<a href="' + esc(href) + '" target="_blank" rel="noopener">Get the spreadsheet (&pound;' + s[2] + ' on Etsy)</a></p>';
+  }
+
   function renderActions(target, opts) {
     var el = typeof target === "string" ? document.querySelector(target) : target;
     if (!el) return;
-    opts = opts || {};
-
-    el.innerHTML =
-      '<section class="lv-actions lv-no-print" aria-labelledby="lv-actions-h">' +
-        '<div class="lv-actions__col">' +
-          '<h2 id="lv-actions-h">Take your results away</h2>' +
-          '<p>Save the whole page, working and all, as a PDF you can keep or send on. ' +
-          'This opens your browser print window: choose <strong>Save as PDF</strong> as the destination.</p>' +
-          '<button type="button" class="lv-btn" onclick="window.print()">Download as PDF</button>' +
-        '</div>' +
-        '<div class="lv-actions__col lv-actions__col--talk">' +
-          '<h2>Want someone to look at it properly?</h2>' +
-          '<p>A calculator cannot see the rest of your position. If you want these figures checked against ' +
-          'your actual accounts, or you are weighing up a decision, put your name on our waiting list and ' +
-          'we will come back to you.</p>' +
-          '<p class="lv-actions__contact">' +
-            /* The waiting list form, not a general contact page. Luvero is on a
-               closed-intake model, so this is where enquiries actually go. */
-            '<a class="lv-btn lv-btn--quiet" href="' + PARENT_SITE + '/waitlist#form">Join the waiting list</a>' +
-            '<span>or email <a href="mailto:admin@luveroaccounting.co.uk">admin@luveroaccounting.co.uk</a>, ' +
-            'call <a href="tel:+441302613515">01302 613515</a>, ' +
-            'or WhatsApp <a href="https://wa.me/447378312288">07378 312288</a>.</span>' +
-          '</p>' +
-        '</div>' +
-      '</section>';
+    /* v2, 21/10/2026: the "take it away" and "talk to someone" boxes are gone.
+       Copy, share and PDF live in the quiet row under the result, and the one
+       way to reach Luvero is the call block under it. Only the spreadsheet
+       offer stays, as a single quiet line, on the pages that have one. */
+    var sheet = spreadsheetHTML();
+    el.innerHTML = sheet ? '<div class="lv-sheet lv-no-print">' + sheet + '</div>' : "";
   }
 
   /* =========================================================================
@@ -859,28 +864,50 @@ var LV = (function () {
   function renderCapture(target, opts) {
     var el = typeof target === "string" ? document.querySelector(target) : target;
     if (!el) return;
-    el.innerHTML = captureHTML(opts);
-    loadCaptureEmbedScript();
+    /* v2, 21/10/2026: the enquiry form is no longer shown. Booking the free
+       call (renderCTA) replaces it, so a result has one next step, not three.
+       captureHTML is kept so the form can be restored by calling it here. */
+    el.innerHTML = "";
   }
 
   /* =========================================================================
      5) HEADER AND FOOTER
      ========================================================================= */
+  var LOGO_GRADIENT = "https://assets.cdn.filesafe.space/BpgHtTsnrkl3fBNU0pJh/media/6aa7dc334c0f71e6c6c12e6e.png";
+  var LOGO_WHITE    = "https://assets.cdn.filesafe.space/BpgHtTsnrkl3fBNU0pJh/media/6a0f1b69e05851175c2badd1.png";
+  var CALENDLY      = "https://calendly.com/luveroaccounting";
+  var PHONE_TEXT    = "01302 613515";
+  var PHONE_TEL     = "tel:+441302613515";
+  var EMAIL         = "hello@luvero.uk";
+
+  function pillHTML(label, href, cls) {
+    return '<a class="lv-pill' + (cls ? " " + cls : "") + '" href="' + href + '" target="_blank" rel="noopener">' +
+      esc(label) + ' <span class="lv-pill__dot" aria-hidden="true">&#8599;</span></a>';
+  }
+
   function headerHTML(toolName) {
+    var path = (window.location.pathname || "/").replace(/\/+$/, "") || "/";
+    function item(href, label) {
+      return '<a href="' + href + '"' + (path === href ? ' aria-current="page"' : "") + '>' + label + '</a>';
+    }
     return '' +
       '<header class="lv-header">' +
         '<div class="lv-header__inner">' +
-          /* The negative (white) wordmark, because the header sits on the purple
-             gradient. The artwork is embedded in luvero.css as a data URI, so
-             nothing has to be uploaded before the site works. */
+          /* v2, 21/10/2026: white header with the gradient wordmark, the same
+             look as luvero.uk. */
           '<a class="lv-brand" href="/">' +
-            '<span class="lv-brand__logo" role="img" aria-label="Luvero"></span>' +
+            '<img src="' + LOGO_GRADIENT + '" alt="Luvero" width="124" height="32">' +
             '<span class="lv-brand__text">' +
               '<span class="lv-brand__name">Business Tax Calculator</span>' +
               '<span class="lv-brand__sub">' + esc(toolName || "Free tools from Luvero") + '</span>' +
             '</span>' +
           '</a>' +
-          '<button type="button" class="lv-btn lv-btn--ghost lv-no-print" onclick="window.print()">Print or save as PDF</button>' +
+          '<nav class="lv-menu lv-no-print" aria-label="Main">' +
+            item("/", "All calculators") +
+            item("/methodology", "How they work") +
+            '<a href="' + PARENT_SITE + '">luvero.uk</a>' +
+          '</nav>' +
+          pillHTML("Book a free call", CALENDLY + "?utm_source=businesstaxcalculator&utm_medium=referral&utm_content=header", "lv-no-print") +
         '</div>' +
       '</header>';
   }
@@ -890,15 +917,18 @@ var LV = (function () {
     return '' +
       '<footer class="lv-footer">' +
         '<div class="lv-footer__inner">' +
-          '<div>' +
+          '<a class="lv-footer__logo" href="' + PARENT_SITE + '"><img src="' + LOGO_WHITE + '" alt="Luvero" width="112" height="29"></a>' +
+          '<p class="lv-footer__contact">Phone <a href="' + PHONE_TEL + '">' + PHONE_TEXT + '</a> &middot; ' +
+            'Email <a href="mailto:' + EMAIL + '">' + EMAIL + '</a></p>' +
+          '<p class="lv-footer__legal">' +
             /* Professional designation: AAT Licensed Accountant, licence 10113057.
                Taken from the AAT pack recorded in BRAND.md and from the notice on
                luvero.uk. Do not substitute any other title. */
-            'Built by <a href="' + PARENT_SITE + '">Luvero Accounting</a>, accountants in Bawtry. ' +
-            'Luvero Accounting Ltd is licensed and regulated by AAT under licence number 10113057. ' +
-            'Registered in England number 10972036. ' +
-            '&copy; ' + yr + '.' +
-          '</div>' +
+            'Built by <a href="' + PARENT_SITE + '">Luvero Accounting</a>. ' +
+            'Luvero Accounting Limited. Registered in England and Wales, company number 10972036. ' +
+            'Registered office: Sparkhouse, Rope Walk, Lincoln, LN6 7DQ. ' +
+            'Licensed and regulated by AAT under licence number 10113057. &copy; ' + yr + '.' +
+          '</p>' +
           '<nav aria-label="Footer">' +
             '<a href="/methodology">How the calculators work</a>' +
             '<a href="/privacy">Privacy notice</a>' +
@@ -1161,11 +1191,12 @@ var LV = (function () {
         '<h2 class="lv-result__title" id="lv-result-h">' + esc(o.title || "Your result") + '</h2>' +
         '<div class="lv-result__grid">' + rows + '</div>' +
         (o.note ? '<p class="lv-result__note">' + o.note + '</p>' : "") +
+        /* v2, 21/10/2026: one quiet row. The call to action sits under the
+           result, so nothing here competes with it. */
         '<div class="lv-result__actions lv-no-print">' +
-          '<button type="button" class="lv-btn lv-btn--sm" data-act="copy">Copy result</button>' +
-          '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="share">Share calculation</button>' +
-          (o.emailTarget ? '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="email">Ask us to check this</button>' : "") +
-          '<button type="button" class="lv-btn lv-btn--quiet lv-btn--sm" data-act="pdf">Save as PDF</button>' +
+          '<button type="button" class="lv-linkbtn" data-act="copy">Copy result</button>' +
+          '<button type="button" class="lv-linkbtn" data-act="share">Share link</button>' +
+          '<button type="button" class="lv-linkbtn" data-act="pdf">Save as PDF</button>' +
           '<span class="lv-result__toast" role="status" hidden></span>' +
         '</div>' +
       '</section>';
@@ -1215,23 +1246,39 @@ var LV = (function () {
      10) LUVERO CALL TO ACTION AND JOURNEY LINK
      -------------------------------------------------------------------------
      One conversion point per page, sitting directly under the result, with
-     wording that changes according to what the result shows. The link goes to
-     the waiting list form, which is where Luvero takes enquiries. `src` tags
-     the link so enquiries can be traced back to a calculator without any
-     analytics on this site.
+     wording that changes according to what the result shows. The link books a
+     free 30-minute call with Dan on Calendly (v2, 21/10/2026). `src` rides
+     along as a UTM tag so a booking can be traced back to the calculator that
+     sent it, without any analytics on this site.
      ========================================================================= */
   function ctaHref(src) {
-    return PARENT_SITE + "/waitlist?src=btc-" + encodeURIComponent(src || "tool") + "#form";
+    return CALENDLY + "?utm_source=businesstaxcalculator&utm_medium=referral&utm_content=" +
+      encodeURIComponent(src || "tool");
   }
 
   function renderCTA(target, o) {
     var el = typeof target === "string" ? document.querySelector(target) : target;
     if (!el) return;
     o = o || {};
+    /* The page's own wording leads (it changes with the result). The button is
+       the same everywhere, so every calculator asks for the same one thing. */
     el.innerHTML =
-      '<aside class="lv-cta lv-no-print">' +
-        '<p>' + o.text + '</p>' +
-        '<a class="lv-btn" href="' + ctaHref(o.src) + '">' + esc(o.button) + '</a>' +
+      '<aside class="lv-cta lv-no-print" aria-label="Talk to Luvero">' +
+        '<div class="lv-cta__text">' +
+          '<p class="lv-cta__lead">' + o.text + '</p>' +
+          '<p class="lv-cta__sub">A calculator cannot see the rest of your position. On a free 30-minute call ' +
+            'we look at your actual figures. You&rsquo;ll speak to Dan.</p>' +
+          '<ul class="lv-proof">' +
+            '<li>4.9 from 56 Google reviews</li>' +
+            '<li>About 400 businesses</li>' +
+            '<li>AAT Licensed Practice</li>' +
+            '<li>QuickBooks Platinum ProAdvisor</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="lv-cta__act">' +
+          pillHTML("Book a free 30-minute call", ctaHref(o.src), "lv-pill--light") +
+          '<p class="lv-cta__alt">or call <a href="' + PHONE_TEL + '">' + PHONE_TEXT + '</a></p>' +
+        '</div>' +
       '</aside>';
   }
 
@@ -1239,13 +1286,13 @@ var LV = (function () {
     var el = typeof target === "string" ? document.querySelector(target) : target;
     if (!el) return;
     o = o || {};
+    /* The one related calculator, as a quiet link rather than a second button. */
     el.innerHTML =
       '<section class="lv-next lv-no-print" aria-labelledby="lv-next-h">' +
-        '<div class="lv-next__text">' +
-          '<h2 id="lv-next-h">' + esc(o.heading || "What to look at next") + '</h2>' +
-          '<p>' + o.text + '</p>' +
-        '</div>' +
-        '<a class="lv-btn" href="' + o.href + '">' + esc(o.label) + '</a>' +
+        '<p class="lv-next__kicker">Related calculator</p>' +
+        '<h2 id="lv-next-h">' + esc(o.heading || "What to look at next") + '</h2>' +
+        '<p>' + o.text + '</p>' +
+        '<a class="lv-next__link" href="' + o.href + '">' + esc(o.label) + ' <span aria-hidden="true">&rarr;</span></a>' +
       '</section>';
   }
 

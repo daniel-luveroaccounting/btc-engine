@@ -875,7 +875,7 @@ var LV = (function () {
      ========================================================================= */
   var LOGO_GRADIENT = "https://assets.cdn.filesafe.space/BpgHtTsnrkl3fBNU0pJh/media/6aa7dc334c0f71e6c6c12e6e.png";
   var LOGO_WHITE    = "https://assets.cdn.filesafe.space/BpgHtTsnrkl3fBNU0pJh/media/6a0f1b69e05851175c2badd1.png";
-  var CALENDLY      = "https://calendly.com/luveroaccounting";
+  var CALENDLY      = "https://calendly.com/luveroaccounting/website";
   var PHONE_TEXT    = "01302 613515";
   var PHONE_TEL     = "tel:+441302613515";
   var EMAIL         = "hello@luvero.uk";
